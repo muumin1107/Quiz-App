@@ -1,121 +1,280 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import axios from 'axios';
+import './App.css';
+
+// カテゴリーと分野の定義（バックエンドと同期）
+const CATEGORIES = {
+  "共通テスト": ["現代文", "英語", "政治経済"],
+  "資格": ["英検", "ニュース検定", "TOEIC"]
+};
+
+const LEVEL_REQUIREMENTS = {
+  "英検": ["1級", "準1級", "2級", "準2級", "3級", "4級", "5級"],
+  "ニュース検定": ["1級", "2級", "準2級", "3級", "4級", "5級"],
+  "TOEIC": ["500点", "600点", "700点", "800点", "900点", "990点"]
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+  // フォーム入力状態
+  const [category, setCategory] = useState('');
+  const [questionType, setQuestionType] = useState('');
+  const [level, setLevel] = useState('');
+  
+  // クイズデータと状態管理
+  const [quizData, setQuizData] = useState(null);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showResult, setShowResult] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // カテゴリー変更時の処理
+  const handleCategoryChange = (e) => {
+    const newCategory = e.target.value;
+    setCategory(newCategory);
+    setQuestionType('');
+    setLevel('');
+  };
+
+  // 分野変更時の処理
+  const handleQuestionTypeChange = (e) => {
+    const newQuestionType = e.target.value;
+    setQuestionType(newQuestionType);
+    setLevel('');
+  };
+
+  // クイズ生成リクエスト
+  const generateQuiz = async () => {
+    setLoading(true);
+    setError(null);
+    setQuizData(null);
+    setSelectedAnswer(null);
+    setShowResult(false);
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (!apiUrl) {
+        throw new Error('API URLが設定されていません。.envファイルを確認してください。');
+      }
+
+      const payload = {
+        category,
+        question_type: questionType,
+        ...(level && { level })
+      };
+
+      const response = await axios.post(`${apiUrl}/generate`, payload, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setQuizData(response.data);
+    } catch (err) {
+      console.error('クイズ生成エラー:', err);
+      if (err.response) {
+        setError(err.response.data.error || 'サーバーエラーが発生しました。');
+      } else if (err.request) {
+        setError('サーバーに接続できませんでした。ネットワーク接続を確認してください。');
+      } else {
+        setError(err.message || '予期せぬエラーが発生しました。');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 回答チェック
+  const checkAnswer = () => {
+    setShowResult(true);
+  };
+
+  // ホームに戻る
+  const goHome = () => {
+    setQuizData(null);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setError(null);
+  };
+
+  // 再出題
+  const regenerateQuiz = () => {
+    generateQuiz();
+  };
+
+  // 利用可能な分野リスト
+  const availableQuestionTypes = category ? CATEGORIES[category] : [];
+  
+  // レベルが必要かどうか
+  const requiresLevel = questionType && LEVEL_REQUIREMENTS[questionType];
+  
+  // 送信ボタンの有効/無効判定
+  const canSubmit = category && questionType && (!requiresLevel || level);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app-container">
+      <header className="app-header">
+        <h1>📚 クイズアプリ</h1>
+      </header>
 
-      <div className="ticks"></div>
+      <main className="main-content">
+        {!quizData ? (
+          // クイズ生成フォーム
+          <div className="form-container">
+            <div className="form-intro">
+              <p>カテゴリーと分野を選択して、クイズに挑戦しましょう！</p>
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="category">カテゴリー</label>
+              <select
+                id="category"
+                value={category}
+                onChange={handleCategoryChange}
+                className="form-select"
+              >
+                <option value="">-- 選択してください --</option>
+                {Object.keys(CATEGORIES).map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
+            {category && (
+              <div className="form-group">
+                <label htmlFor="questionType">分野</label>
+                <select
+                  id="questionType"
+                  value={questionType}
+                  onChange={handleQuestionTypeChange}
+                  className="form-select"
                 >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+                  <option value="">-- 選択してください --</option>
+                  {availableQuestionTypes.map((type) => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+            {requiresLevel && (
+              <div className="form-group">
+                <label htmlFor="level">難易度</label>
+                <select
+                  id="level"
+                  value={level}
+                  onChange={(e) => setLevel(e.target.value)}
+                  className="form-select"
+                >
+                  <option value="">-- 選択してください --</option>
+                  {LEVEL_REQUIREMENTS[questionType].map((lvl) => (
+                    <option key={lvl} value={lvl}>{lvl}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {error && (
+              <div className="error-message">
+                <strong>エラー:</strong> {error}
+              </div>
+            )}
+
+            <button
+              onClick={generateQuiz}
+              disabled={!canSubmit || loading}
+              className="btn btn-primary"
+            >
+              {loading ? '生成中...' : 'クイズを生成'}
+            </button>
+          </div>
+        ) : (
+          // クイズ表示
+          <div className="quiz-container">
+            <div className="quiz-header">
+              <span className="quiz-badge">{category}</span>
+              <span className="quiz-badge">{questionType}</span>
+              {level && <span className="quiz-badge">{level}</span>}
+            </div>
+
+            <div className="question-section">
+              <h2>問題</h2>
+              <p className="question-text">{quizData.question}</p>
+            </div>
+
+            <div className="choices-section">
+              <h3>選択肢</h3>
+              {quizData.choices.map((choice, index) => (
+                <div
+                  key={index}
+                  className={`choice-item ${
+                    selectedAnswer === index ? 'selected' : ''
+                  } ${
+                    showResult
+                      ? index === quizData.answer_index
+                        ? 'correct'
+                        : selectedAnswer === index
+                        ? 'incorrect'
+                        : ''
+                      : ''
+                  }`}
+                  onClick={() => !showResult && setSelectedAnswer(index)}
+                >
+                  <span className="choice-number">{index + 1}</span>
+                  <span className="choice-text">{choice}</span>
+                  {showResult && index === quizData.answer_index && (
+                    <span className="choice-icon">✓</span>
+                  )}
+                  {showResult && selectedAnswer === index && index !== quizData.answer_index && (
+                    <span className="choice-icon">✗</span>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {!showResult ? (
+              <button
+                onClick={checkAnswer}
+                disabled={selectedAnswer === null}
+                className="btn btn-primary"
+              >
+                回答を確認
+              </button>
+            ) : (
+              <div className="result-section">
+                <div className={`result-banner ${selectedAnswer === quizData.answer_index ? 'success' : 'failure'}`}>
+                  {selectedAnswer === quizData.answer_index ? (
+                    <>
+                      <span className="result-icon">🎉</span>
+                      <span>正解です！</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="result-icon">😢</span>
+                      <span>不正解です</span>
+                    </>
+                  )}
+                </div>
+
+                <div className="explanation-section">
+                  <h3>解説</h3>
+                  <p>{quizData.explanation}</p>
+                </div>
+
+                <div className="action-buttons">
+                  <button onClick={regenerateQuiz} className="btn btn-primary">
+                    🔄 再出題
+                  </button>
+                  <button onClick={goHome} className="btn btn-secondary">
+                    🏠 ホームに戻る
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
