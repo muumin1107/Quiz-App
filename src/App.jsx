@@ -64,13 +64,13 @@ function App() {
       };
 
       // API Gateway経由でLambda関数を呼び出し
-      // Lambda関数は { statusCode, headers, body } を返す
-      // API Gatewayがbodyの内容をHTTPレスポンスとして返す
+      // タイムアウト設定: 30秒（本番環境でのBedrock処理を考慮）
       const response = await axios.post(`${apiUrl}/generate`, payload, {
         headers: {
           'Content-Type': 'application/json'
           // Originヘッダーはブラウザが自動的に設定
-        }
+        },
+        timeout: 30000 // 30秒
       });
 
       // 正常系: response.data には { question, choices, answer_index, explanation } が含まれる
@@ -79,7 +79,10 @@ function App() {
       console.error('クイズ生成エラー:', err);
       
       // 異常系の処理
-      if (err.response) {
+      if (err.code === 'ECONNABORTED') {
+        // タイムアウトエラー
+        setError('リクエストがタイムアウトしました。もう一度お試しください。');
+      } else if (err.response) {
         // サーバーからエラーレスポンスが返された場合（4xx, 5xx）
         // response.data.error にエラーメッセージが含まれる
         setError(err.response.data.error || 'サーバーエラーが発生しました。');
@@ -129,7 +132,13 @@ function App() {
       </header>
 
       <main className="main-content">
-        {!quizData ? (
+        {loading ? (
+          // ローディング表示
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p className="loading-text">問題を生成しています...</p>
+          </div>
+        ) : !quizData ? (
           // クイズ生成フォーム
           <div className="form-container">
             <div className="form-intro">
@@ -253,20 +262,6 @@ function App() {
               </button>
             ) : (
               <div className="result-section">
-                <div className={`result-banner ${selectedAnswer === quizData.answer_index ? 'success' : 'failure'}`}>
-                  {selectedAnswer === quizData.answer_index ? (
-                    <>
-                      <span className="result-icon">🎉</span>
-                      <span>正解です！</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="result-icon">😢</span>
-                      <span>不正解です</span>
-                    </>
-                  )}
-                </div>
-
                 <div className="explanation-section">
                   <h3>解説</h3>
                   <p>{quizData.explanation}</p>
