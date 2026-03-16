@@ -53,29 +53,41 @@ function App() {
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
       if (!apiUrl) {
-        throw new Error('API URLが設定されていません。.envファイルを確認してください。');
+        throw new Error('API URLが設定されていません。.envファイルまたはAmplify環境変数を確認してください。');
       }
 
+      // リクエストペイロードの構築
       const payload = {
         category,
         question_type: questionType,
         ...(level && { level })
       };
 
+      // API Gateway経由でLambda関数を呼び出し
+      // Lambda関数は { statusCode, headers, body } を返す
+      // API Gatewayがbodyの内容をHTTPレスポンスとして返す
       const response = await axios.post(`${apiUrl}/generate`, payload, {
         headers: {
           'Content-Type': 'application/json'
+          // Originヘッダーはブラウザが自動的に設定
         }
       });
 
+      // 正常系: response.data には { question, choices, answer_index, explanation } が含まれる
       setQuizData(response.data);
     } catch (err) {
       console.error('クイズ生成エラー:', err);
+      
+      // 異常系の処理
       if (err.response) {
+        // サーバーからエラーレスポンスが返された場合（4xx, 5xx）
+        // response.data.error にエラーメッセージが含まれる
         setError(err.response.data.error || 'サーバーエラーが発生しました。');
       } else if (err.request) {
+        // リクエストは送信されたがレスポンスがない場合
         setError('サーバーに接続できませんでした。ネットワーク接続を確認してください。');
       } else {
+        // リクエストの設定中にエラーが発生した場合
         setError(err.message || '予期せぬエラーが発生しました。');
       }
     } finally {

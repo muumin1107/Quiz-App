@@ -50,13 +50,25 @@ git push -u origin main
 
 ### 2-4. 環境変数の設定
 
+**重要**: Amplify Consoleで環境変数を設定します。
+
 「環境変数」セクションで以下を追加:
 
 ```
-VITE_API_URL = https://your-api-gateway-url.amazonaws.com/prod
+キー: API_URL
+値: https://your-api-gateway-url.amazonaws.com/prod
 ```
 
-**重要**: API GatewayのURLを正確に入力してください
+**注意事項**:
+- 環境変数名は `API_URL` です（`VITE_API_URL` ではありません）
+- `amplify.yml` が自動的に `VITE_API_URL` に変換します
+- API GatewayのURLは正確に入力してください
+- URLの末尾に `/generate` は含めません（コード内で自動的に追加されます）
+
+例:
+```
+API_URL = https://abc123xyz.execute-api.ap-northeast-1.amazonaws.com/prod
+```
 
 ### 2-5. デプロイ
 

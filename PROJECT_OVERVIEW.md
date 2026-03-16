@@ -113,11 +113,17 @@ const [error, setError] = useState(null);
 
 ## API 通信
 
+### 環境変数の取得
+
+- **ローカル開発**: `.env` ファイルの `VITE_API_URL`
+- **Amplifyデプロイ**: 環境変数 `API_URL` → `amplify.yml` で `VITE_API_URL` に変換
+
 ### リクエスト例
 
 ```javascript
-POST /generate
+POST ${VITE_API_URL}/generate
 Content-Type: application/json
+Origin: (ブラウザが自動設定)
 
 {
   "category": "資格",
@@ -126,8 +132,22 @@ Content-Type: application/json
 }
 ```
 
-### レスポンス例
+### レスポンス構造
 
+**Lambda関数が返すデータ**:
+```javascript
+{
+  statusCode: 200,
+  headers: {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "...",
+    ...
+  },
+  body: '{"question":"...","choices":[...],"answer_index":1,"explanation":"..."}'
+}
+```
+
+**API Gateway経由で受け取るデータ** (`response.data`):
 ```javascript
 {
   "question": "次の英文の空欄に入る最も適切な語を選びなさい。",
@@ -140,6 +160,21 @@ Content-Type: application/json
   "answer_index": 2,
   "explanation": "文脈から「〜の後」を意味する after が適切です。"
 }
+```
+
+### エラーハンドリング
+
+**400/500エラー時のレスポンス** (`err.response.data`):
+```javascript
+{
+  "error": "カテゴリー '資格' に分野 '現代文' は許可されていません。"
+}
+```
+
+**ネットワークエラー**:
+```javascript
+// err.request が存在するが err.response がない場合
+"サーバーに接続できませんでした。ネットワーク接続を確認してください。"
 ```
 
 ## ユーザーフロー
