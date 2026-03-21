@@ -217,8 +217,6 @@ function App() {
   const showListeningCheckbox   = questionType && LISTENING_SUBJECTS.has(questionType);
   const canSubmit               = category && questionType && (!requiresLevel || level);
 
-  // ---------- 選択肢のスタイルクラスを導出 ----------
-
   const choiceClass = (index) => [
     'choice-item',
     selectedAnswer === index                                       && 'selected',
@@ -370,6 +368,14 @@ function App() {
                   <h3>解説</h3>
                   <p>{quizData.explanation}</p>
                 </div>
+
+                {quizData.audio_script && (
+                  <div className="explanation-section">
+                    <h3>音声スクリプト</h3>
+                    <p className="audio-script-text">{quizData.audio_script}</p>
+                  </div>
+                )}
+
                 <div className="action-buttons">
                   <button onClick={generateQuiz} className="btn btn-primary">🔄 再出題</button>
                   <button onClick={goHome}        className="btn btn-secondary">🏠 ホームに戻る</button>
