@@ -1,84 +1,89 @@
-/* カラーパレット & CSS変数 */
+/* ==============================================================================
+   カラーパレット & トークン
+   ============================================================================== */
+
 :root {
-  --color-primary: #2563eb;
-  --color-primary-dark: #1e40af;
-  --color-primary-light: #3b82f6;
-  
-  --color-success: #10b981;
-  --color-success-light: #d1fae5;
-  --color-error: #ef4444;
-  --color-error-light: #fee2e2;
-  
-  --color-bg-gradient-start: #f8fafc;
-  --color-bg-gradient-end: #e0f2fe;
-  
-  --color-text-primary: #0f172a;
+  --color-primary:        #2563eb;
+  --color-primary-dark:   #1e40af;
+
+  --color-success:        #10b981;
+  --color-success-light:  #d1fae5;
+  --color-error:          #ef4444;
+  --color-error-light:    #fee2e2;
+
+  --color-bg-start:       #f8fafc;
+  --color-bg-end:         #e0f2fe;
+
+  --color-text-primary:   #0f172a;
   --color-text-secondary: #475569;
-  --color-text-muted: #64748b;
-  
-  --color-border: #e2e8f0;
-  --color-border-focus: #3b82f6;
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  
-  --radius-sm: 8px;
+  --color-text-muted:     #64748b;
+
+  --color-border:         #e2e8f0;
+  --color-border-focus:   #3b82f6;
+
+  --color-listening-bg:     #f0f9ff;
+  --color-listening-border: #bae6fd;
+  --color-listening-text:   #0369a1;
+
+  --shadow-sm:  0 1px 2px 0 rgba(0,0,0,.05);
+  --shadow-md:  0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+  --shadow-lg:  0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  --ease: cubic-bezier(0.4,0,0.2,1);
+  --t-fast:  150ms;
+  --t-base:  200ms;
+  --t-slow:  300ms;
 }
 
-/* リセット & ベース */
-* {
+/* ==============================================================================
+   リセット & ベース
+   ============================================================================== */
+
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 
-    'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, var(--color-bg-gradient-start) 0%, var(--color-bg-gradient-end) 100%);
+  background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-end) 100%);
   color: var(--color-text-primary);
   min-height: 100vh;
   line-height: 1.6;
 }
 
-/* アプリコンテナ */
+/* ==============================================================================
+   レイアウト
+   ============================================================================== */
+
 .app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* ヘッダー */
 .app-header {
   text-align: center;
   padding: 2rem 1rem 1.5rem;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255,255,255,.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255,255,255,.3);
   box-shadow: var(--shadow-sm);
 }
 
 .app-header h1 {
   font-size: 1.875rem;
   font-weight: 700;
-  letter-spacing: -0.025em;
-  color: var(--color-text-primary);
-  margin: 0;
+  letter-spacing: -.025em;
 }
 
-/* メインコンテンツ */
 .main-content {
   flex: 1;
   display: flex;
@@ -87,16 +92,35 @@ body {
   padding: 2rem 1rem;
 }
 
-/* ローディングコンテナ */
-.loading-container {
-  background: white;
-  padding: 3rem 2rem;
+/* ==============================================================================
+   カード共通
+   ============================================================================== */
+
+.loading-container,
+.form-container,
+.quiz-container {
+  background: #fff;
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
-  max-width: 400px;
   width: 100%;
-  text-align: center;
+  padding: 2rem;
 }
+
+.loading-container { max-width: 400px; text-align: center; padding: 3rem 2rem; }
+.form-container    { max-width: 480px; }
+.quiz-container    {
+  max-width: 640px;
+  animation: slideIn var(--t-slow) var(--ease);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ==============================================================================
+   ローディング
+   ============================================================================== */
 
 .loading-spinner {
   width: 48px;
@@ -105,12 +129,10 @@ body {
   border: 4px solid var(--color-border);
   border-top-color: var(--color-primary);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin .8s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .loading-text {
   color: var(--color-text-secondary);
@@ -118,27 +140,17 @@ body {
   font-weight: 500;
 }
 
-/* フォームコンテナ */
-.form-container {
-  background: white;
-  padding: 2rem;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 480px;
-}
+/* ==============================================================================
+   フォーム
+   ============================================================================== */
 
 .form-intro {
   text-align: center;
   margin-bottom: 2rem;
   padding-bottom: 2rem;
   border-bottom: 1px solid var(--color-border);
-}
-
-.form-intro p {
   color: var(--color-text-secondary);
-  font-size: 0.9375rem;
-  line-height: 1.6;
+  font-size: .9375rem;
 }
 
 .form-group {
@@ -147,77 +159,142 @@ body {
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: .5rem;
   font-weight: 600;
-  color: var(--color-text-primary);
-  font-size: 0.875rem;
-  letter-spacing: 0.01em;
+  font-size: .875rem;
+  letter-spacing: .01em;
 }
 
 .form-select {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: .75rem 2.75rem .75rem 1rem;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
-  font-size: 0.9375rem;
+  font-size: .9375rem;
   color: var(--color-text-primary);
-  background-color: white;
+  background-color: #fff;
   cursor: pointer;
-  transition: all var(--transition-base);
-  -webkit-appearance: none;
-  -moz-appearance: none;
+  transition: all var(--t-base) var(--ease);
   appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
-  background-position: right 0.75rem center;
+  background-position: right .75rem center;
   background-size: 1.25rem;
-  padding-right: 2.75rem;
 }
 
-.form-select:hover {
-  border-color: var(--color-text-muted);
-}
-
+.form-select:hover { border-color: var(--color-text-muted); }
 .form-select:focus {
   outline: none;
   border-color: var(--color-border-focus);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.1);
 }
 
-/* エラーメッセージ */
+/* ==============================================================================
+   リスニングチェックボックス
+   ============================================================================== */
+
+.checkbox-group {
+  background: var(--color-listening-bg);
+  border: 1.5px solid var(--color-listening-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.125rem;
+  margin-bottom: 1.5rem;
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: .75rem;
+  cursor: pointer;
+  margin-bottom: 0 !important;
+  font-weight: 600 !important;
+}
+
+.checkbox-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkbox-custom {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-listening-text);
+  border-radius: 5px;
+  background: #fff;
+  transition: all var(--t-base) var(--ease);
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  background: var(--color-listening-text);
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  content: '';
+  display: block;
+  width: 5px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translate(-1px,-1px);
+}
+
+.checkbox-text {
+  font-size: .9375rem;
+  color: var(--color-listening-text);
+}
+
+.checkbox-hint {
+  margin-top: .5rem;
+  font-size: .8125rem;
+  color: var(--color-text-muted);
+}
+
+/* ==============================================================================
+   エラー
+   ============================================================================== */
+
 .error-message {
-  background-color: var(--color-error-light);
+  background: var(--color-error-light);
   border: 1.5px solid var(--color-error);
   color: #991b1b;
-  padding: 0.875rem 1rem;
+  padding: .875rem 1rem;
   border-radius: var(--radius-md);
   margin-bottom: 1.5rem;
-  font-size: 0.875rem;
+  font-size: .875rem;
   line-height: 1.5;
 }
 
-.error-message strong {
-  font-weight: 600;
-}
+.error-message strong { font-weight: 600; }
 
-/* ボタン */
+/* ==============================================================================
+   ボタン
+   ============================================================================== */
+
 .btn {
-  padding: 0.875rem 1.5rem;
-  font-size: 0.9375rem;
+  width: 100%;
+  padding: .875rem 1.5rem;
+  font-size: .9375rem;
   font-weight: 600;
+  letter-spacing: .01em;
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all var(--transition-base);
-  width: 100%;
+  transition: all var(--t-base) var(--ease);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  letter-spacing: 0.01em;
 }
 
 .btn-primary {
   background: var(--color-primary);
-  color: white;
+  color: #fff;
   box-shadow: var(--shadow-sm);
 }
 
@@ -233,13 +310,13 @@ body {
 }
 
 .btn-primary:disabled {
-  opacity: 0.5;
+  opacity: .5;
   cursor: not-allowed;
 }
 
 .btn-secondary {
   background: #64748b;
-  color: white;
+  color: #fff;
   box-shadow: var(--shadow-sm);
 }
 
@@ -254,44 +331,141 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-/* クイズコンテナ */
-.quiz-container {
-  background: white;
-  padding: 2rem;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 640px;
-  animation: slideIn var(--transition-slow);
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* ==============================================================================
+   クイズヘッダー・バッジ
+   ============================================================================== */
 
 .quiz-header {
   display: flex;
-  gap: 0.5rem;
+  gap: .5rem;
   margin-bottom: 1.75rem;
   flex-wrap: wrap;
 }
 
 .quiz-badge {
   background: var(--color-primary);
-  color: white;
-  padding: 0.375rem 0.875rem;
+  color: #fff;
+  padding: .375rem .875rem;
   border-radius: var(--radius-lg);
-  font-size: 0.8125rem;
+  font-size: .8125rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
+  letter-spacing: .01em;
 }
+
+.quiz-badge-listening {
+  background: var(--color-listening-text);
+}
+
+/* ==============================================================================
+   音声プレイヤー
+   ============================================================================== */
+
+.audio-player {
+  background: var(--color-listening-bg);
+  border: 1.5px solid var(--color-listening-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.25rem 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.audio-instruction {
+  display: flex;
+  align-items: flex-start;
+  gap: .625rem;
+  margin-bottom: 1rem;
+}
+
+.audio-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.audio-instruction p {
+  font-size: .875rem;
+  color: var(--color-listening-text);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.audio-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all var(--t-base) var(--ease);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.audio-btn-play {
+  width: 44px;
+  height: 44px;
+  background: var(--color-listening-text);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 1.125rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.audio-btn-play:hover  { background: #075985; box-shadow: var(--shadow-md); transform: scale(1.05); }
+.audio-btn-play:active { transform: scale(.98); }
+
+.audio-btn-replay {
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  color: var(--color-listening-text);
+  border: 1.5px solid var(--color-listening-border);
+  border-radius: 50%;
+  font-size: 1rem;
+}
+
+.audio-btn-replay:hover {
+  background: #fff;
+  border-color: var(--color-listening-text);
+}
+
+.audio-progress-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+}
+
+.audio-seek {
+  width: 100%;
+  height: 4px;
+  cursor: pointer;
+  accent-color: var(--color-listening-text);
+}
+
+.audio-time {
+  display: flex;
+  justify-content: space-between;
+  font-size: .75rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.audio-play-count {
+  margin-top: .625rem;
+  font-size: .75rem;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+/* ==============================================================================
+   問題・選択肢
+   ============================================================================== */
 
 .question-section {
   margin-bottom: 2rem;
@@ -300,11 +474,10 @@ body {
 }
 
 .question-section h2 {
-  color: var(--color-text-primary);
   margin-bottom: 1rem;
   font-size: 1.125rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -.01em;
 }
 
 .question-text {
@@ -313,33 +486,31 @@ body {
   color: var(--color-text-secondary);
 }
 
-/* 選択肢セクション */
 .choices-section {
   margin-bottom: 2rem;
 }
 
 .choices-section h3 {
-  color: var(--color-text-primary);
   margin-bottom: 1rem;
   font-size: 1rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -.01em;
 }
 
 .choice-item {
   display: flex;
   align-items: center;
+  gap: 1rem;
   padding: 1rem 1.125rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: .75rem;
+  min-height: 64px;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all var(--transition-base);
-  gap: 1rem;
-  min-height: 64px;
+  background: #fff;
+  transition: all var(--t-base) var(--ease);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  background: white;
 }
 
 .choice-item:hover:not(.correct):not(.incorrect) {
@@ -347,213 +518,190 @@ body {
   background: #f8fafc;
 }
 
-.choice-item:active {
-  transform: scale(0.99);
-}
+.choice-item:active { transform: scale(.99); }
 
 .choice-item.selected {
   border-color: var(--color-primary);
   background: #eff6ff;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.1);
 }
 
 .choice-item.correct {
   border-color: var(--color-success);
   background: var(--color-success-light);
-  animation: correctPulse 0.4s ease-out;
+  animation: correctPulse .4s ease-out;
 }
 
 .choice-item.incorrect {
   border-color: var(--color-error);
   background: var(--color-error-light);
-  animation: incorrectShake 0.4s ease-out;
+  animation: incorrectShake .4s ease-out;
 }
 
-@keyframes correctPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-
+@keyframes correctPulse  { 0%,100%{transform:scale(1)} 50%{transform:scale(1.02)} }
 @keyframes incorrectShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
+  0%,100%{transform:translateX(0)}
+  25%    {transform:translateX(-4px)}
+  75%    {transform:translateX(4px)}
 }
 
 .choice-number {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   width: 36px;
   height: 36px;
   background: var(--color-primary);
-  color: white;
+  color: #fff;
   border-radius: 50%;
   font-weight: 700;
-  flex-shrink: 0;
-  font-size: 0.9375rem;
-  transition: all var(--transition-base);
+  font-size: .9375rem;
+  transition: background var(--t-base) var(--ease);
 }
 
-.choice-item.correct .choice-number {
-  background: var(--color-success);
-}
-
-.choice-item.incorrect .choice-number {
-  background: var(--color-error);
-}
+.choice-item.correct   .choice-number { background: var(--color-success); }
+.choice-item.incorrect .choice-number { background: var(--color-error); }
 
 .choice-text {
   flex: 1;
-  font-size: 0.9375rem;
-  color: var(--color-text-primary);
-  line-height: 1.6;
+  font-size: .9375rem;
   font-weight: 500;
+  line-height: 1.6;
 }
 
 .choice-icon {
-  font-size: 1.5rem;
   flex-shrink: 0;
+  font-size: 1.5rem;
   font-weight: 700;
 }
 
-/* 結果セクション */
+/* ==============================================================================
+   結果・解説
+   ============================================================================== */
+
 .result-section {
   margin-top: 2rem;
-  animation: fadeIn var(--transition-slow);
+  animation: fadeIn var(--t-slow) var(--ease);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
 
 .explanation-section {
   background: #f8fafc;
-  padding: 1.5rem;
-  border-radius: var(--radius-md);
-  margin-bottom: 1.5rem;
   border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .explanation-section h3 {
-  color: var(--color-text-primary);
-  margin-bottom: 0.875rem;
+  margin-bottom: .875rem;
   font-size: 1rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -.01em;
 }
 
 .explanation-section p {
-  font-size: 0.9375rem;
+  font-size: .9375rem;
   line-height: 1.7;
   color: var(--color-text-secondary);
 }
 
-/* アクションボタン */
 .action-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  gap: .75rem;
 }
 
 .action-buttons .btn {
-  padding: 0.875rem 1rem;
-  font-size: 0.9375rem;
+  padding: .875rem 1rem;
+  font-size: .9375rem;
 }
 
-/* レスポンシブ - タブレット */
+/* ==============================================================================
+   レスポンシブ
+   ============================================================================== */
+
 @media (min-width: 640px) {
-  .app-header h1 {
-    font-size: 2.25rem;
-  }
-  
+  .app-header h1 { font-size: 2.25rem; }
+  .loading-container { padding: 3.5rem 2.5rem; }
   .form-container,
-  .quiz-container {
-    padding: 2.5rem;
-  }
-  
-  .loading-container {
-    padding: 3.5rem 2.5rem;
-  }
+  .quiz-container { padding: 2.5rem; }
 }
 
-/* レスポンシブ - デスクトップ */
 @media (min-width: 1024px) {
-  .main-content {
-    padding: 3rem 1rem;
-  }
-  
+  .main-content { padding: 3rem 1rem; }
   .form-container,
-  .quiz-container {
-    padding: 3rem;
-  }
-  
+  .quiz-container { padding: 3rem; }
   .choice-item:hover:not(.correct):not(.incorrect) {
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
   }
 }
 
-/* アクセシビリティ */
+/* ==============================================================================
+   アクセシビリティ
+   ============================================================================== */
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: .01ms !important;
   }
 }
 
-/* ダークモード対応（システム設定） */
+/* ==============================================================================
+   ダークモード
+   ============================================================================== */
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg-gradient-start: #0f172a;
-    --color-bg-gradient-end: #1e293b;
-    --color-text-primary: #f1f5f9;
-    --color-text-secondary: #cbd5e1;
-    --color-text-muted: #94a3b8;
-    --color-border: #334155;
+    --color-bg-start:         #0f172a;
+    --color-bg-end:           #1e293b;
+    --color-text-primary:     #f1f5f9;
+    --color-text-secondary:   #cbd5e1;
+    --color-text-muted:       #94a3b8;
+    --color-border:           #334155;
+    --color-listening-bg:     #0c2a3a;
+    --color-listening-border: #164e63;
+    --color-listening-text:   #38bdf8;
   }
-  
+
+  .loading-container,
   .form-container,
-  .quiz-container,
-  .loading-container {
+  .quiz-container {
     background: #1e293b;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,.5);
   }
-  
+
   .form-select {
     background-color: #0f172a;
     color: var(--color-text-primary);
     border-color: var(--color-border);
   }
-  
+
   .choice-item {
     background: #0f172a;
     border-color: var(--color-border);
   }
-  
-  .choice-item:hover:not(.correct):not(.incorrect) {
-    background: #1e293b;
-  }
-  
-  .choice-item.selected {
-    background: #1e3a8a;
-  }
-  
+
+  .choice-item:hover:not(.correct):not(.incorrect) { background: #1e293b; }
+  .choice-item.selected                            { background: #1e3a8a; }
+
   .explanation-section {
     background: #0f172a;
     border-color: var(--color-border);
   }
-  
+
   .app-header {
-    background: rgba(30, 41, 59, 0.7);
+    background: rgba(30,41,59,.7);
     border-bottom-color: var(--color-border);
   }
+
+  .checkbox-custom { background: #0f172a; }
+
+  .audio-btn-play        { background: #0284c7; }
+  .audio-btn-play:hover  { background: #0369a1; }
 }
